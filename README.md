@@ -1,4 +1,41 @@
-# Tuesday September 2, 2025
+# Tuesday September 3, 2025
+
+Playwright POC for screen scrape.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Caryover - blocks on refactor: ratelimited.
+
 
 ## Plan
 - Refactor synesthetic schemas submodule into backend
@@ -165,6 +202,12 @@ Removed shader_lib_id in shader requests/responses; linkage handled separately.
 Requests now follow synesthetic_schemas; responses remain stable with IDs.
 Optional X-Schema-Version header available for client gating.
 FE to add client-side validations where the external schema is permissive (e.g., uniform stage/type).
+
+Controls/Tones aligned
+Requests: external synesthetic_schemas models.
+Responses: API models with IDs; no extra strict validators.
+Fixed enum serialization to JSON before DB writes/updates to avoid 500s.
+Added X-Schema-Version check for controls and tones.
 
 
 
