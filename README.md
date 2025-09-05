@@ -9,8 +9,7 @@
 Solidify schemas dev environment ssot and test clean opn new setup.
 
 
-
-
+clean up key issues on dev box
 
 
 
@@ -18,7 +17,8 @@ Solidify schemas dev environment ssot and test clean opn new setup.
 -
 
 ## Log
--
+-cleaned up key issues
+-dev and test new buold.sh script for nix and poetry and node setup in schemas
 
 # Review
     - Highlights:
