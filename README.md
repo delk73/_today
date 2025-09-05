@@ -6,10 +6,11 @@
 
 ## Plan
 
-Solidify schemas dev environment ssot and test clean opn new setup.
+-establish baseline on sdfk-backend refactor
 
+-draft implemenmtation plan
 
-clean up key issues on dev box
+-execute implementation  plan
 
 
 
@@ -17,8 +18,11 @@ clean up key issues on dev box
 -
 
 ## Log
--cleaned up key issues
--dev and test new buold.sh script for nix and poetry and node setup in schemas
+- cleaned up key issues
+- dev and test for nix and poetry and node setup in schemas
+- ci implemeted green
+- pushed nix setup to main
+
 
 # Review
     - Highlights:
