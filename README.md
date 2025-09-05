@@ -1,10 +1,41 @@
-# Tuesday September 4, 2025
+# Tuesday September 5, 2025
 
 
 ## Caryover resume, - blocks removed
 
 
 ## Plan
+
+Solidify schemas dev environment ssot and test clean opn new setup.
+
+
+
+
+
+
+
+## Meetings
+-
+
+## Log
+-
+
+# Review
+    - Highlights:
+    - Roadblocks:
+    - Next steps:
+
+
+
+
+
+
+
+
+
+**OLD NOTES**
+
+
 
 - Refactor synesthetic schemas submodule into backend
 
@@ -271,17 +302,3 @@ Added X-Schema-Version check for controls and tones.
 - Refactor synesthetic schemas submodule into frontend
 
 
-
-
-
-
-## Meetings
--
-
-## Log
--
-
-# Review
-    - Highlights:
-    - Roadblocks:
-    - Next steps:
