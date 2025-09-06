@@ -41,6 +41,25 @@
 
 
 
+
+What I fixed
+
+Asset import source: Examples now come from the SSOT by default (libs/synesthetic-schemas/examples). Local app/examples stays only for comparison or explicit override via EXAMPLES_DIR.
+Asset schema for validation: Switched SynestheticAsset validation to the external synesthetic_schemas.synesthetic_asset.SynestheticAsset. This aligns the loader with the exact request model your /synesthetic-assets/nested route expects, avoiding drift between a local nested model and the SSOT examples.
+No derived posts: Removed the control/modulation extraction and standalone posts from derived data to avoid the ModulationItem serialization mess and reduce duplication.
+Payload posting: We still post the raw dicts and only strip $schemaRef before sending. We don’t pass Pydantic instances to JSON insertion, eliminating enum/object serialization problems.
+What remains (and how to finish cleanly)
+
+Duplicates: Standalone component examples (Shader/Tone/Control/Haptic) in the SSOT are still posted because tests rely on them being imported. If you want a pure asset-only import during local runs, I can add a small env gate you can flip in codex.sh, for example:
+ONLY_ASSETS=1 → loader uses only the asset pattern and skips standalone components.
+Zero assets symptom you saw: That happened in the unit test scenario because EXAMPLES_DIR is set to a temp dir that does not contain SynestheticAsset_Example*.json. In full runs against SSOT, assets should now import via the external schema path. If you still see 0 assets with SSOT examples available, tell me which exact command/environment is used and I’ll instrument the loader to print:
+examples_dir being used
+matched files for SynestheticAsset pattern
+first post status for nested endpoint
+If you want, I’ll add the env toggle (ONLY_ASSETS) in the loader and wire codex.sh to set it so the local runner imports assets-only from SSOT, and leaves standalone examples out — while tests keep using their own EXAMPLES_DIR fixture.
+
+
+
 - Refactor synesthetic schemas submodule into backend
 
 ** COMPLETE **
