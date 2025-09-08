@@ -15,7 +15,7 @@ finished be and fe schema first refactors.
 
 
 
--clean up and docs pass on FE and BE
+- clean up and docs pass on FE and BE
 
 
 
@@ -25,6 +25,12 @@ finished be and fe schema first refactors.
 
 ## Log
 
+
+## Thoughts
+- Teaching a cat to fetch
+    - Trying to wrangle ai into some sort of tool to project vision feels a bit like that time I tried to teach a cat to fetch
+        - Throw the ball. Watch the cat look at it. Cat looks at me. I get the ball.
+        - Repeat
 
 
 # Review
