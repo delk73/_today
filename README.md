@@ -1,14 +1,15 @@
-# Sunday September 7, 2025
+# Monday September 8, 2025
 
 
-Finished backend refactor to synesthetic schemas baseline. breaks fe api contract on new branch.
+finished be and fe schema first refactors. 
+
 
 
 
 
 ## Plan
 
-Fix broken contract on FE new migration branch, point to synesthetic-schemas for ssot schema fit.
+clean up and docs pass on FE and BE
 
 
 
