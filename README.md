@@ -1,13 +1,12 @@
-# Monday September 8, 2025
-
-
-finished be and fe schema first refactors. 
-
+# Monday September 9, 2025
 
 
 
 
 ## Plan
+
+- continue clean up and docs pass on FE and BE
+
 
 - begin feature flow for compute shader integration into the synesthetic asset
     - iterate canon audit prompt
@@ -15,13 +14,13 @@ finished be and fe schema first refactors.
 
 
 
-- clean up and docs pass on FE and BE
+
 
 
 
 
 ## Meetings
--
+- D 7:30am
 
 ## Log
 
