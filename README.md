@@ -4,6 +4,10 @@
 
 ## Plan
 
+
+Shore up backend CI. Arose from block
+
+
 Validate refactored BE - response schema design - keep in local BE or SSOT?
 
 
@@ -14,9 +18,13 @@ Validate refactored BE - response schema design - keep in local BE or SSOT?
 
 
 
+## Blocks
+
+- backend ci fragile - triage
+
+
 
 ## Meetings
-- D 7:30am
 
 ## Log
 
