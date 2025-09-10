@@ -1,7 +1,5 @@
 # Wednesday September 10, 2025
 
-
-
 ## Plan
 
 - Add Backend CI Implementation Summary
@@ -85,19 +83,96 @@
 
     They don’t share the same environment assumptions. The fragility is in the host-level guardrails: they invoke schemas tooling without respecting the schemas repo’s dev environment.
 
-
-
-
 - begin feature flow for compute shader integration into the synesthetic asset
     - iterate canon audit prompt
     - generate gap report
 
+## Backend CI ↔ Schemas CI Integration
 
+### Current State (Broken)
+
+```mermaid
+flowchart TD
+
+    subgraph Backend_CI["Backend CI (sdfk-backend)"]
+        A1["Checkout repo + submodules"]
+        A2["Run preflight_guardrails.sh"]
+        A3["Run test.sh (containerized)"]
+    end
+
+    subgraph Guardrails["Preflight Guardrails"]
+        G1["Version SSOT check"]
+        G2["Dependency pin check"]
+        G3["Lint/Type surfacing (ruff, pyright)"]
+        G4["Codegen cleanliness → calls schemas/ensure_codegen_clean.sh"]
+    end
+
+    subgraph Schemas_CI["Schemas CI (synesthetic-schemas)"]
+        S1["Poetry/Nix dev env (datamodel-code-generator installed)"]
+        S2["Schema normalization & validation"]
+        S3["Codegen drift check (ensure_codegen_clean.sh)"]
+    end
+
+    %% Backend Flow
+    A1 --> A2 --> Guardrails
+    A2 --> A3
+
+    %% Guardrails Flow
+    G1 --> G2 --> G3 --> G4
+    G4 -.->|expects codegen tools| Schemas_CI
+
+    %% Schemas Flow
+    Schemas_CI --> S2 --> S3
+
+    %% Disconnect (as node)
+    N1["❌ Backend CI does not bootstrap schemas env\nMissing datamodel-code-generator\ncauses fragile guardrail failures"]
+    G4 -.-> N1
+```
+
+### Target State (Fixed)
+
+```mermaid
+flowchart TD
+
+    subgraph Backend_CI["Backend CI (sdfk-backend)"]
+        A1["Checkout repo + submodules"]
+        A1a["Install schemas dev env (Poetry/Nix)"]
+        A2["Run preflight_guardrails.sh"]
+        A3["Run test.sh (containerized)"]
+    end
+
+    subgraph Guardrails["Preflight Guardrails"]
+        G1["Version SSOT check"]
+        G2["Dependency pin check"]
+        G3["Lint/Type surfacing (ruff, pyright)"]
+        G4["Codegen cleanliness → calls schemas/ensure_codegen_clean.sh"]
+    end
+
+    subgraph Schemas_CI["Schemas CI (synesthetic-schemas)"]
+        S1["Poetry/Nix dev env (datamodel-code-generator installed)"]
+        S2["Schema normalization & validation"]
+        S3["Codegen drift check (ensure_codegen_clean.sh)"]
+    end
+
+    %% Backend Flow
+    A1 --> A1a --> A2 --> Guardrails
+    A2 --> A3
+
+    %% Guardrails Flow
+    G1 --> G2 --> G3 --> G4
+    G4 -->|uses schemas tools| Schemas_CI
+
+    %% Schemas Flow
+    Schemas_CI --> S2 --> S3
+
+    %% Fix (as node)
+    N2["✅ Backend CI bootstraps schemas env\n(Poetry/Nix install) before running guardrails.\nGuardrails now find datamodel-code-generator\nand match schemas CI behavior"]
+    A1a -.-> N2
+```
 
 ## Meetings
 
 ## Log
-
 
 ## Thoughts
 - Teaching a cat to fetch
@@ -105,13 +180,10 @@
         - Throw the ball. Watch the cat look at it. Cat looks at me. I get the ball.
         - Repeat
 
-
 # Review
     - Highlights:e2e running and serving assets with schema ssot.
     - Roadblocks: - backend ci fragile
 
     - Next steps: Triage backend CI
-
-
 
 **PROMPTS**
