@@ -8,14 +8,14 @@
 
     #### Test Harness (`test.sh`)
 
-    *   **Purpose**: Canonical entrypoint for running tests in CI.
-    *   **Mode**: Container-centric — spins up Docker services (Postgres, Redis, app containers).
+    *   **Purpose**: Canonical entrypoint for running tests in CI.  
+    *   **Mode**: Container-centric — spins up Docker services (Postgres, Redis, app containers).  
     *   **Flow**:
 
-        1.  Builds `sdfk-backend-web` and `sdfk-backend-trainer` images.
-        2.  Configures runtime sysctls for Redis (e.g., `vm.overcommit_memory`, `somaxconn`).
-        3.  Starts services via `docker-compose` (or equivalent).
-        4.  Runs the test suite (`pytest`, integration tests, etc.) inside the containers.
+        1.  Builds `sdfk-backend-web` and `sdfk-backend-trainer` images.  
+        2.  Configures runtime sysctls for Redis (e.g., `vm.overcommit_memory`, `somaxconn`).  
+        3.  Starts services via `docker-compose` (or equivalent).  
+        4.  Runs the test suite (`pytest`, integration tests, etc.) inside the containers.  
 
     This approach makes `test.sh` self-contained: local dev and CI both use it, ensuring reproducibility.
 
@@ -27,18 +27,18 @@
 
     *   **Checks Included**:
 
-        *   **Version SSOT**: Frontmatter in README/docs matches `libs/synesthetic-schemas/version.json`.
-        *   **Dependency Pin Consistency**: Aligns root Poetry vs. schemas/python/pyproject.toml.
-        *   **Lint & Type Surfacing**: Runs `ruff` and `pyright` (non-blocking locally, strict in CI).
-        *   **No blanket `# noqa` / `# type: ignore`**.
-        *   **Deprecation Guard**: Flags `jsonschema.RefResolver`.
-        *   **Codegen Cleanliness**: Calls `libs/synesthetic-schemas/scripts/ensure_codegen_clean.sh`.
+        *   **Version SSOT**: Frontmatter in README/docs matches `libs/synesthetic-schemas/version.json`.  
+        *   **Dependency Pin Consistency**: Aligns root Poetry vs. schemas/python/pyproject.toml.  
+        *   **Lint & Type Surfacing**: Runs `ruff` and `pyright` (non-blocking locally, strict in CI).  
+        *   **No blanket `# noqa` / `# type: ignore`**.  
+        *   **Deprecation Guard**: Flags `jsonschema.RefResolver`.  
+        *   **Codegen Drift Check**: Runs `libs/synesthetic-schemas/scripts/ensure_codegen_clean.sh` **only to confirm vendored code is fresh**.  
         *   **Legacy Example Audit**: Flags old “auto-converted” bundle notes.
 
     *   **Execution Modes**:
 
-        *   **Local dev**: Non-blocking, surfaces warnings.
-        *   **CI**: Enforced strict (`STRICT_GUARDRAILS=1 STRICT_CODEGEN=1`).
+        *   **Local dev**: Non-blocking, surfaces warnings.  
+        *   **CI**: Enforced strict (`STRICT_GUARDRAILS=1 STRICT_CODEGEN=1`).  
 
     ---
 
@@ -46,46 +46,45 @@
 
     *   **`.github/workflows/preflight-guardrails.yml`**:
 
-        *   Runs on PRs and pushes to `main`.
+        *   Runs on PRs and pushes to `main`.  
         *   Steps:
 
-            1.  Check out repo (with submodules).
-            2.  Install Python runtime deps (`requirements.txt`).
-            3.  Install dev tooling (pinned `ruff`, `pyright`).
-            4.  Set up Node 20 for schema codegen drift check.
-            5.  Run `scripts/preflight_guardrails.sh` in strict mode.
+            1.  Check out repo (with submodules).  
+            2.  Install Python runtime deps (`requirements.txt`).  
+            3.  Install dev tooling (pinned `ruff`, `pyright`).  
+            4.  Run `scripts/preflight_guardrails.sh` in strict mode.  
 
-    *   **Main test CI** (not fully expanded here, but implied by `test.sh`):
-
-        *   Builds containers, runs integration/unit tests inside them.
-        *   Uses Docker services (Postgres/Redis) instead of local Poetry/Nix installs.
-        *   Enforces green test suite before merge.
+    *   **Main test CI** (not fully expanded here, but implied by `test.sh`):  
+        *   Builds containers, runs integration/unit tests inside them.  
+        *   Uses Docker services (Postgres/Redis) instead of local Poetry/Nix installs.  
+        *   Enforces green test suite before merge.  
 
     ---
 
     #### The Disconnect
 
-    *   **Schemas Repo Expectation**:
-        Codegen requires `datamodel-code-generator`, declared in the **schemas root Poetry config**.
-    *   **Backend CI Reality**:
-        Backend doesn’t bootstrap schemas’ Poetry environment. When `preflight_guardrails.sh` calls into schemas’ `ensure_codegen_clean.sh`, the Python toolchain is missing → error.
-    *   **Why It’s Fragile**:
-        Backend CI assumes schemas repo is just static files, but in reality it has its own dev-tooling contract.
+    *   **Schemas Repo Expectation**:  
+        It owns codegen. `ensure_codegen_clean.sh` ensures checked-in artifacts are consistent.  
+
+    *   **Backend CI Reality**:  
+        Backend preflight tries to *re-run codegen* in schemas, which requires bootstrapping schemas’ dev env. That drags in fragile deps.  
+
+    *   **Why It’s Fragile**:  
+        Backend shouldn’t generate at all — just validate the committed outputs. The single source of truth must remain in the schemas repo.  
 
     ---
 
     #### Key Takeaway
 
-    Backend CI has two layers:
+    Backend CI has two layers:  
 
-    1.  **Containerized `test.sh`** → isolated, reproducible app/runtime testing.
-    2.  **Host-level `preflight_guardrails.sh`** → schema/codegen/lint/version checks.
+    1.  **Containerized `test.sh`** → isolated, reproducible app/runtime testing.  
+    2.  **Host-level `preflight_guardrails.sh`** → validation only (no schema generation).  
 
-    They don’t share the same environment assumptions. The fragility is in the host-level guardrails: they invoke schemas tooling without respecting the schemas repo’s dev environment.
+    Fix = change backend guardrails so they **only check for drift** in vendored schemas artifacts.  
+    If drift exists → fail and instruct developer to regenerate in the schemas repo, commit, and bump submodule.  
 
-- begin feature flow for compute shader integration into the synesthetic asset
-    - iterate canon audit prompt
-    - generate gap report
+---
 
 ## Backend CI ↔ Schemas CI Integration
 
@@ -104,13 +103,13 @@ flowchart TD
         G1["Version SSOT check"]
         G2["Dependency pin check"]
         G3["Lint/Type surfacing (ruff, pyright)"]
-        G4["Codegen cleanliness → calls schemas/ensure_codegen_clean.sh"]
+        G4["❌ Codegen cleanliness tries to regenerate schemas"]
     end
 
     subgraph Schemas_CI["Schemas CI (synesthetic-schemas)"]
         S1["Poetry/Nix dev env (datamodel-code-generator installed)"]
         S2["Schema normalization & validation"]
-        S3["Codegen drift check (ensure_codegen_clean.sh)"]
+        S3["✅ Codegen generation + drift check"]
     end
 
     %% Backend Flow
@@ -119,13 +118,10 @@ flowchart TD
 
     %% Guardrails Flow
     G1 --> G2 --> G3 --> G4
-    G4 -.->|expects codegen tools| Schemas_CI
+    G4 -.->|fragile call| Schemas_CI
 
-    %% Schemas Flow
-    Schemas_CI --> S2 --> S3
-
-    %% Disconnect (as node)
-    N1["❌ Backend CI does not bootstrap schemas env\nMissing datamodel-code-generator\ncauses fragile guardrail failures"]
+    %% Disconnect
+    N1["Backend CI mistakenly attempts to run schemas' generation tools\ninstead of just verifying committed outputs"]
     G4 -.-> N1
 ```
 
@@ -136,8 +132,7 @@ flowchart TD
 
     subgraph Backend_CI["Backend CI (sdfk-backend)"]
         A1["Checkout repo + submodules"]
-        A1a["Install schemas dev env (Poetry/Nix)"]
-        A2["Run preflight_guardrails.sh"]
+        A2["Run preflight_guardrails.sh (validate only)"]
         A3["Run test.sh (containerized)"]
     end
 
@@ -145,30 +140,28 @@ flowchart TD
         G1["Version SSOT check"]
         G2["Dependency pin check"]
         G3["Lint/Type surfacing (ruff, pyright)"]
-        G4["Codegen cleanliness → calls schemas/ensure_codegen_clean.sh"]
+        G4["✅ Codegen drift check: ensure_codegen_clean.sh only verifies"]
     end
 
     subgraph Schemas_CI["Schemas CI (synesthetic-schemas)"]
         S1["Poetry/Nix dev env (datamodel-code-generator installed)"]
         S2["Schema normalization & validation"]
-        S3["Codegen drift check (ensure_codegen_clean.sh)"]
+        S3["Codegen generation + drift check"]
     end
 
     %% Backend Flow
-    A1 --> A1a --> A2 --> Guardrails
+    A1 --> A2 --> Guardrails
     A2 --> A3
 
     %% Guardrails Flow
     G1 --> G2 --> G3 --> G4
-    G4 -->|uses schemas tools| Schemas_CI
+    G4 -->|verify artifacts match| Schemas_CI
 
-    %% Schemas Flow
-    Schemas_CI --> S2 --> S3
-
-    %% Fix (as node)
-    N2["✅ Backend CI bootstraps schemas env\n(Poetry/Nix install) before running guardrails.\nGuardrails now find datamodel-code-generator\nand match schemas CI behavior"]
-    A1a -.-> N2
+    %% Fix
+    N2["Backend CI no longer re-generates.\nIt validates schemas artifacts are clean.\nIf not, fail and instruct to update schemas repo + bump submodule."]
+    G4 -.-> N2
 ```
+
 
 ## Meetings
 
