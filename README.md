@@ -1,11 +1,9 @@
-# Wednesday September 10, 2025
+# Friday September 12, 2025
 
 ## Plan
-
-- Docs pass on CI for schemas, backend
-
-
-- Work out CI for fe_ts
+Spec MCP Server
+Rip out MCP from backend
+lightweight MCP repo
 
 ## Meetings
 
@@ -14,8 +12,8 @@
 ## Thoughts
 
 # Review
-    - Highlights: ci sorted in schemas and be
-    - Roadblocks: - no fe ci, no hosting env other tyhan local
+    - Highlights:
+    - Roadblocks: - no fe ci, no hosting env other than local
 
     - Next steps: Setup hosting environ
 
