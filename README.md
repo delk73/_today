@@ -2,7 +2,7 @@
 
 ## Plan
 Spec MCP Server
-Rip out MCP from backend
+Rip out MCP from backend - Done
 lightweight MCP repo
 
 ## Meetings
