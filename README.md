@@ -1,9 +1,8 @@
-# Friday September 12, 2025
+# Saturday September 13, 2025
 
 ## Plan
-Spec MCP Server
-Rip out MCP from backend - Done
-lightweight MCP repo
+Stand up MCP Server
+
 
 ## Meetings
 
@@ -13,7 +12,7 @@ lightweight MCP repo
 
 # Review
     - Highlights:
-    - Roadblocks: - no fe ci, no hosting env other than local
+    - Roadblocks: - python env management still a POS
 
     - Next steps: Setup hosting environ
 
